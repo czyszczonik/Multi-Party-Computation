@@ -41,7 +41,8 @@ export default {
                 firstName: '',
                 lastName: '',
                 username: '',
-                password: ''
+                password: '',
+                salt: ''
             },
             submitted: false
         }

@@ -1,6 +1,9 @@
 import config from 'config';
 import { authHeader } from '../_helpers'; 
 
+const crypto = require('crypto');
+var sha512 = require('js-sha512');
+
 export const userService = {
     login,
     logout,
@@ -8,28 +11,23 @@ export const userService = {
     getAll,
     getById,
     update,
-    delete: _delete
+    delete: _delete,
+    getData,
+    getSalt
 };
 
 //TODO: change endpoints
-function login(username, password) {
+function login(username, password, salt) {
+    password = sha512(salt+password);
+    console.log('pass'+password);
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
     };
 
-    return fetch(`${config.apiUrl}/users/authenticate`, requestOptions)
-        .then(handleResponse)
-        .then(user => {
-            // login successful if there's a jwt token in the response
-            if (user.token) {
-                // store user details and jwt token in local storage to keep user logged in between page refreshes
-                localStorage.setItem('user', JSON.stringify(user));
-            }
-
-            return user;
-        });
+    return fetch(`${config.apiUrl}/auth/login`, requestOptions)
+        .then(handleResponse);
 }
 
 function logout() {
@@ -38,13 +36,16 @@ function logout() {
 }
 
 function register(user) {
+    user.salt = crypto.randomBytes(128).toString('base64')
+    user.password = sha512(user.password+user.salt)
+
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(user)
     };
 
-    return fetch(`${config.apiUrl}/users/register`, requestOptions).then(handleResponse);
+    return fetch(`${config.apiUrl}/auth/register`, requestOptions).then(handleResponse);
 }
 
 function getAll() {
@@ -93,6 +94,21 @@ function _delete(id) {
     };
 
     return fetch(`${config.apiUrl}/users/${id}`, requestOptions).then(handleResponse);
+}
+
+function getData() {
+    const requestOptions = {
+        method: 'GET'
+    };
+
+}
+
+function getSalt(username) {
+    const requestOptions = {
+        method: 'GET'
+    };
+
+    return fetch(`${config.apiUrl}/auth/salt/${username}`, requestOptions).then(handleResponse);
 }
 
 function handleResponse(response) {

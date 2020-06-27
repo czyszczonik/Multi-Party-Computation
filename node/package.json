@@ -6,9 +6,13 @@
     "build": "webpack --mode production"
   },
   "dependencies": {
+    "js-sha512": "^0.8.0",
+    "v-img": "^0.2.0",
     "vee-validate": "^2.2.8",
     "vue": "^2.6.10",
+    "vue-picture-input": "^2.1.6",
     "vue-router": "^3.1.3",
+    "vue-socket.io": "^3.0.9",
     "vuex": "^3.1.2"
   },
   "devDependencies": {

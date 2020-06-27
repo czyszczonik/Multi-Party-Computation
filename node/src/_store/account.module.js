@@ -7,10 +7,10 @@ const state = user
     : { status: {}, user: null };
 
 const actions = {
-    login({ dispatch, commit }, { username, password }) {
+    login({ dispatch, commit }, { username, password, salt }) {
         commit('loginRequest', { username });
     
-        userService.login(username, password)
+        userService.login(username, password, salt)
             .then(
                 user => {
                     commit('loginSuccess', user);
@@ -44,6 +44,9 @@ const actions = {
                     dispatch('alert/error', error, { root: true });
                 }
             );
+    },
+    getSalt({ dispatch, commit }, username) {
+        userService.getSalt(username);
     }
 };
 

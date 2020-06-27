@@ -1,14 +1,15 @@
 import Vue from 'vue';
 import VeeValidate from 'vee-validate';
+import VueImg from 'v-img';
 
 import { store } from './_store';
 import { router } from './_helpers';
-// import App from './app/App';
+import App from './app/App';
 
 Vue.use(VeeValidate);
+Vue.use(VueImg);
 
-// // setup fake backend
-// import { configureFakeBackend } from './_helpers';
+// import { configureFakeBackend } from './_helpers/fake-backend';
 // configureFakeBackend();
 
 new Vue({

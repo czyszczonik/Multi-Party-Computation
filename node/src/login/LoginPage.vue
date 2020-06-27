@@ -29,7 +29,8 @@ export default {
         return {
             username: '',
             password: '',
-            submitted: false
+            submitted: false,
+            salt: ''
         }
     },
     computed: {
@@ -40,13 +41,26 @@ export default {
         this.logout();
     },
     methods: {
-        ...mapActions('account', ['login', 'logout']),
+        ...mapActions('account', ['login', 'logout', 'getSalt']),
         handleSubmit (e) {
             this.submitted = true;
-            const { username, password } = this;
-            if (username && password) {
-                this.login({ username, password })
+            var salt = localStorage.getItem('salt');
+            if (salt === null) {
+                salt = this.getSalt(this.username);
             }
+
+            if (salt === undefined || salt === null || salt.length == 0) {
+                //TODO: report error
+                console.log('err')
+                return
+            }
+            console.log('salt ');
+            console.log(salt);
+            // var username = this.username
+            // var password = this.password
+            // if (username && password) {
+            //     this.login(username, password, salt)
+            // }
         }
     }
 };

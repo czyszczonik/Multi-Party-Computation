@@ -4,7 +4,7 @@ import Router from 'vue-router';
 import HomePage from '../home/HomePage'
 import LoginPage from '../login/LoginPage'
 import RegisterPage from '../register/RegisterPage'
-
+import ProfilePage from '../profile/ProfilePage'
 Vue.use(Router);
 
 export const router = new Router({
@@ -13,6 +13,7 @@ export const router = new Router({
     { path: '/', component: HomePage },
     { path: '/login', component: LoginPage },
     { path: '/register', component: RegisterPage },
+    { path: '/profile', component: ProfilePage },
 
     // otherwise redirect to home
     { path: '*', redirect: '/' }
@@ -25,9 +26,9 @@ router.beforeEach((to, from, next) => {
   const authRequired = !publicPages.includes(to.path);
   const loggedIn = localStorage.getItem('user');
 
-  if (authRequired && !loggedIn) {
-    return next('/login');
-  }
+  // if (authRequired && !loggedIn) {
+  //   return next('/login');
+  // }
 
   next();
 })
