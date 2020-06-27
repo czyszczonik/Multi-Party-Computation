@@ -1,0 +1,321 @@
+openapi: 3.0.0
+info:
+  title: Application API
+  description: Optional multiline or single-line description in [CommonMark](http://commonmark.org/help/) or HTML.
+  version: 0.0.1
+
+paths:
+  ######################
+  ######   AUTH   ######
+  ######################
+
+  /auth/salt/{username}:
+    get:
+      operationId: Auth.service.salt
+      tags: [Auth, GET]
+      summary: Authorizes users
+      parameters:
+              - in: path
+                name: username
+                schema:
+                  type: string
+                required: true
+      responses:
+        200:
+          description: Salt retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SaltResponse'
+        422:
+          description: User not found!
+
+  /auth/register:
+    post:
+      operationId: Auth.service.register
+      tags: [Auth, POST]
+      summary: Creates a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationRequest'
+      responses:
+        200:
+          description: Account created
+        400:
+          description: Username or e-mail taken
+        500:
+          description: Database error
+
+  /auth/login:
+    post:
+      operationId: Auth.service.login
+      tags: [Auth, POST]
+      summary: Logs in a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        200:
+          description: Login successful
+        401:
+          description: Login unsuccessful
+
+  /auth/logout:
+    get:
+      operationId: Auth.service.logout
+      tags: [Auth, GET]
+      summary: Logs current user out
+      responses:
+        200:
+          description: Logout successful
+        500:
+          description: Server error
+
+
+  /profile/basic:
+    get:
+      operationId: Auth.service.getMyData
+      tags: [Data, GET]
+      summary: Authorizes users
+      responses:
+        200:
+          description: Salt retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationRequest'
+        422:
+          description: User not found!
+
+components:
+  schemas:
+    ### Authetication
+
+    SaltRequest:
+      type: object
+      properties:
+        username:
+          type: string
+      required: [username]
+
+
+    SaltResponse:
+      type: object
+      properties:
+        salt:
+          type: string
+
+    RegistrationRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        salt:
+          type: string
+      required: [username, password, firstName, lastName, salt]
+
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required: [username, password]
+
+
+
+
+#
+#   /auth/isLogged:
+#     get:
+#       operationId: endpoints.authentication.isLogged
+#       tags: [Auth, GET]
+#       summary: Says if user is logged in or not
+#       responses:
+#         200:
+#           description: User logged in
+#         401:
+#           description: User not logged in
+#
+#   ######################
+#   ####  APPLICATION  ###
+#   ######################
+#   /measurements:
+#     post:
+#       operationId: endpoints.application.addMeasurements
+#       tags: [Measurements, POST]
+#       summary: Add measurement data
+#       requestBody:
+#         required: true
+#         content:
+#           application/json:
+#             schema:
+#               $ref: '#/components/schemas/MeasurementPostRequest'
+#       responses:
+#         200:
+#           description: Operation successful
+#         500:
+#           description: Database error
+#     get:
+#       operationId: endpoints.application.getMeasurements
+#       tags: [Measurements, GET]
+#       summary: Get measurement data
+#       requestBody:
+#         required: true
+#         content:
+#           application/json:
+#             schema:
+#               $ref: '#/components/schemas/MeasurementGetRequest'
+#       responses:
+#         200:
+#           description: Doctors retrieved
+#           content:
+#             application/json:
+#               schema:
+#                 $ref: '#/components/schemas/MeasurementGetResponse'
+#         500:
+#           description: Internal error
+#
+#   /doctors:
+#     put:
+#       operationId: endpoints.application.updateDoctors
+#       tags: [Doctors, PUT]
+#       summary: Update doctors list
+#       requestBody:
+#         required: true
+#         content:
+#           application/json:
+#             schema:
+#               $ref: '#/components/schemas/DoctorPutRequest'
+#       responses:
+#         200:
+#           description: OK
+#         500:
+#           description: not OK  #TODO: expand ; Return list in positive response
+#     get:
+#       operationId: endpoints.application.getDoctors
+#       tags: [Doctors, GET]
+#       summary: Get measurement data
+#       responses:
+#         200:
+#           description: Measurements retrieved
+#           content:
+#             application/json:
+#               schema:
+#                 $ref: '#/components/schemas/DoctorGetResponse'
+#
+#   /notifications:
+#     get:
+#       operationId: endpoints.application.getNotifications
+#       tags: [Notifications, GET]
+#       summary: Get notifications
+#       responses:
+#         200:
+#           description: Notifications retrieved
+#           content:
+#             application/json:
+#               schema:
+#                 $ref: '#/components/schemas/NotificationGetResponse'
+#         #TODO: add more
+#
+# components:
+#   schemas:
+#     ### Authetication
+#     RegistrationRequest:
+#       type: object
+#       properties:
+#         email:
+#           type: string
+#         password:
+#           type: string
+#         username:
+#           type: string
+#         role:
+#           type: string
+#           enum: [doctor, patient]
+#       required: [email, password, username, role]
+#
+#     LoginRequest:
+#       type: object
+#       properties:
+#         username:
+#           type: string
+#         password:
+#           type: string
+#       required: [username, password]
+#
+#     MeasurementPostRequest:
+#       type: object
+#       properties:
+#         measurements:
+#           type: array
+#           items:
+#             $ref: '#/components/schemas/MeasurementObject'
+#       required: [measurements]
+#
+#     MeasurementGetRequest:
+#       type: object
+#       properties:
+#         start:
+#           type: integer
+#         end:
+#           type: integer
+#       required: [start, end]
+#
+    # MeasurementGetResponse:
+    #   type: object
+    #   properties:
+    #     measurements:
+    #       type: array
+    #       items:
+    #         $ref: '#/components/schemas/MeasurementObject'
+#
+#     DoctorPutRequest:
+#       type: array
+#       items:
+#         $ref: '#/components/schemas/DoctorObject'
+#
+#     DoctorGetResponse:
+#       type: array
+#       items:
+#         $ref: '#/components/schemas/DoctorObject'
+#
+#     NotificationGetResponse: #TODO: expand
+#       type: array
+#       items:
+#         type: string
+#
+#     DoctorObject:
+#       type: string
+#
+#     MeasurementObject:
+#       type: object
+#       properties:
+#         bpm:
+#           type: integer
+#         timestamp:
+#           type: integer
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
