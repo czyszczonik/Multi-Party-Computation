@@ -4,8 +4,9 @@ from .Client import getMongoClient
 
 client = getMongoClient()
 
-def createUser(user):
+def createUser(user, profil):
     client.users.insert_one(user.toDictionary())
+    client.profile.insert_one(profil.toDictionary())
 
 def getUser(username):
     return User(client.users.find_one({"username" : f"{username}"}))

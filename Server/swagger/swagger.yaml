@@ -78,20 +78,36 @@ paths:
           description: Server error
 
 
-  /profile/basic:
+  /profile:
     get:
-      operationId: Auth.service.getMyData
+      operationId: Profile.service.getProfile
       tags: [Data, GET]
-      summary: Authorizes users
+      summary: Returns profile info
       responses:
         200:
-          description: Salt retrieved.
+          description: Profile retrieved.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RegistrationRequest'
-        422:
-          description: User not found!
+                $ref: '#/components/schemas/ProfileResponse'
+        500:
+          description: Database error!
+
+    put:
+      operationId: Profile.service.updateProfile
+      tags: [UPDATE, PUT]
+      summary: Updates profile info
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdate'
+      responses:
+        200:
+          description: Profile Updated.
+        500:
+          description: Database error!
 
 components:
   schemas:
@@ -136,9 +152,36 @@ components:
       required: [username, password]
 
 
+    ProfileResponse:
+          type: object
+          properties:
+            username:
+              type: string
+            firstName:
+              type: string
+            lastName:
+              type: string
+            age:
+              type: integer
+            bio:
+              type: string
+            imageUrl:
+              type: string
+            phone:
+              type: string
 
+    ProfileUpdate:
+          type: object
+          properties:
+            age:
+              type: integer
+            bio:
+              type: string
+            imageUrl:
+              type: string
+            phone:
+              type: string
 
-#
 #   /auth/isLogged:
 #     get:
 #       operationId: endpoints.authentication.isLogged
