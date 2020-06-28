@@ -3,7 +3,8 @@ import { authHeader } from '../_helpers';
 import { stringify } from 'querystring';
 
 const crypto = require('crypto');
-var sha512 = require('js-sha512');
+var sha512 = require('crypto-js/sha512');
+var sha256 = require('crypto-js/sha256');
 
 export const userService = {
     login,
@@ -19,6 +20,7 @@ export const userService = {
 
 function login(username, pass, salt) {
     var password = sha512(pass+salt);
+    var secretPassword = sha256(salt+pass);
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -31,6 +33,7 @@ function login(username, pass, salt) {
             user => {
                 if (user.username) {
                     localStorage.setItem('user', JSON.stringify(user));
+                    localStorage.setItem('secretPassword', secretPassword);
                 }
             }
         );
