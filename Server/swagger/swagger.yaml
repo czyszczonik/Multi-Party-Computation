@@ -80,7 +80,7 @@ paths:
 
   /profile:
     get:
-      operationId: Profile.service.getProfile
+      operationId: Profile.service.getMyProfile
       tags: [Data, GET]
       summary: Returns profile info
       responses:
@@ -109,6 +109,27 @@ paths:
         500:
           description: Database error!
 
+  /profile/{username}:
+    get:
+      operationId: Profile.service.getProfile
+      tags: [Auth, GET]
+      summary: Gets profile info
+      parameters:
+              - in: path
+                name: username
+                schema:
+                  type: string
+                required: true
+      responses:
+        200:
+          description: Profile retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+        422:
+          description: User not found!
+          
 components:
   schemas:
     ### Authetication

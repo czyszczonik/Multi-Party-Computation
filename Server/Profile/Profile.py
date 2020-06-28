@@ -1,7 +1,8 @@
 class Profile():
     def __init__(self, username, firstName = None, lastName = None, age = None, bio = None, imageUrl = None, phone = None):
         if username is None:
-            return None
+            self.username = None
+            return
         if firstName is None:
             dict = username
             self.username = dict.get('username', {})
