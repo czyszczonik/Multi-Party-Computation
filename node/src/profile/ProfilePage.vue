@@ -55,10 +55,10 @@ export default {
     },
     created () {
         userData = this.getUserData();
-        this.age = userData['age'] ?? '';
-        this.bio = userData['bio'] ?? '';
-        this.imageUrl = userData['imageUrl'] ?? '';
-        this.phone = userData['phone'] ?? '';
+        this.age = userData['age'] || '';
+        this.bio = userData['bio'] || '';
+        this.imageUrl = userData['imageUrl'] || '';
+        this.phone = userData['phone'] || '';
     },
     methods: {
         ...mapActions('users', {
