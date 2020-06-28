@@ -187,6 +187,34 @@ paths:
           description: Secret not found!
         500:
           description: Database error!
+
+
+  ######################
+  #####   PAIRS    #####
+  ######################
+
+  /pair/result:
+    get:
+      operationId: Result.service.getMatchedPairs
+      tags: [PAIRS, GET]
+      summary: Obtains Matched Pairs.
+      responses:
+        200:
+          description: Pairs retrieved.
+        500:
+          description: Database error!
+
+
+  /pair/new:
+    get:
+      operationId: Result.service.getUnmatchedPairs
+      tags: [PAIRS, GET]
+      summary: Obtains Unmatched Pairs.
+      responses:
+        200:
+          description: Pairs retrieved.
+        500:
+          description: Database error!
 components:
   schemas:
     ### Authetication
