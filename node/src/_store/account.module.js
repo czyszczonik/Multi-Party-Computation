@@ -9,7 +9,6 @@ const state = user
 const actions = {
     login({ dispatch, commit }, { username, password, salt }) {
         commit('loginRequest', { username });
-    
         userService.login(username, password, salt)
             .then(
                 user => {
@@ -24,6 +23,7 @@ const actions = {
     },
     logout({ commit }) {
         userService.logout();
+        localStorage.clear();
         commit('logout');
     },
     register({ dispatch, commit }, user) {
@@ -46,7 +46,7 @@ const actions = {
             );
     },
     getSalt({ dispatch, commit }, username) {
-        userService.getSalt(username);
+        return userService.getSalt(username);
     }
 };
 
@@ -75,7 +75,7 @@ const mutations = {
     },
     registerFailure(state, error) {
         state.status = {};
-    }
+    },
 };
 
 export const account = {

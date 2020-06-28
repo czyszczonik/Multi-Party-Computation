@@ -53,9 +53,12 @@ export default {
             account: state => state.account,
         })
     },
-    //TODO: replace getAllUsers with getprofiledata or something
     created () {
-        this.getUserData();
+        userData = this.getUserData();
+        this.age = userData['age'] ?? '';
+        this.bio = userData['bio'] ?? '';
+        this.imageUrl = userData['imageUrl'] ?? '';
+        this.phone = userData['phone'] ?? '';
     },
     methods: {
         ...mapActions('users', {
@@ -64,27 +67,20 @@ export default {
             update: 'update'
         }),
         handleSubmit (e) {
-            //TODO: implement
-            // this.submitted = true;
-            // const { username, password } = this;
-            // if (username && password) {
-            //     this.login({ username, password })
-            // }
+            this.submitted = true;
+            var userData = {
+                age: this.age,
+                bio: this.bio,
+                imageUrl: this.imageUrl,
+                phone: this.phone
+            };
+            this.update(userData);
         },
         uploadImage (e) {
                 const file = e.target.files[0]
                 this.image = file
                 this.imageUrl = URL.createObjectURL(file)
         },
-        // onPictureChange (image) {
-        //     //TODO: remove console logs
-        //     if (image) {
-        //         console.log('Good')
-        //         this.image = image
-        //     } else {
-        //         console.log('Bad')
-        //     }
-        // }
     }
 };
 </script>

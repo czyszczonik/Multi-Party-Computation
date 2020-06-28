@@ -44,23 +44,24 @@ export default {
         ...mapActions('account', ['login', 'logout', 'getSalt']),
         handleSubmit (e) {
             this.submitted = true;
-            var salt = localStorage.getItem('salt');
-            if (salt === null) {
-                salt = this.getSalt(this.username);
-            }
 
-            if (salt === undefined || salt === null || salt.length == 0) {
-                //TODO: report error
-                console.log('err')
-                return
+            var username = this.username;
+            var password = this.password;
+            var salt = localStorage.getItem('salt');
+            if (username && password) {
+                if (salt === null || typeof(salt) === undefined) {
+                    this.getSalt(username)
+                        .then(
+                            response => {
+                                salt = response.salt;
+                                localStorage.setItem('salt', salt);
+                                this.login({ username, password, salt });
+                            }
+                        );
+                } else {
+                    this.login({ username, password, salt })
+                }
             }
-            console.log('salt ');
-            console.log(salt);
-            // var username = this.username
-            // var password = this.password
-            // if (username && password) {
-            //     this.login(username, password, salt)
-            // }
         }
     }
 };

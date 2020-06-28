@@ -1,5 +1,6 @@
 import config from 'config';
 import { authHeader } from '../_helpers'; 
+import { stringify } from 'querystring';
 
 const crypto = require('crypto');
 var sha512 = require('js-sha512');
@@ -9,17 +10,15 @@ export const userService = {
     logout,
     register,
     getAll,
-    getById,
     update,
     delete: _delete,
     getData,
-    getSalt
+    getSalt,
+    swipe
 };
 
-//TODO: change endpoints
-function login(username, password, salt) {
-    password = sha512(salt+password);
-    console.log('pass'+password);
+function login(username, pass, salt) {
+    var password = sha512(pass+salt);
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -27,12 +26,22 @@ function login(username, password, salt) {
     };
 
     return fetch(`${config.apiUrl}/auth/login`, requestOptions)
-        .then(handleResponse);
+        .then(handleResponse)
+        .then(
+            user => {
+                if (user.username) {
+                    localStorage.setItem('user', JSON.stringify(user));
+                }
+            }
+        );
 }
 
+//TODO: check
 function logout() {
-    // remove user from local storage to log user out
-    localStorage.removeItem('user');
+    const requestOptions = {
+        method: 'GET',
+    };
+    return fetch(`${config.apiUrl}/auth/logout`);
 }
 
 function register(user) {
@@ -46,6 +55,7 @@ function register(user) {
     };
 
     return fetch(`${config.apiUrl}/auth/register`, requestOptions).then(handleResponse);
+
 }
 
 function getAll() {
@@ -57,36 +67,26 @@ function getAll() {
     return fetch(`${config.apiUrl}/users`, requestOptions).then(handleResponse);
 }
 
-
-function getById(id) {
-    const requestOptions = {
-        method: 'GET',
-        headers: authHeader()
-    };
-
-    return fetch(`${config.apiUrl}/users/${id}`, requestOptions).then(handleResponse);
-}
-
-function update(user) {
+function update(userData) {
     const requestOptions = {
         method: 'PUT',
-        headers: { ...authHeader(), 'Content-Type': 'application/json' },
-        body: JSON.stringify(user)
+        headers: {'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
     };
 
-    return fetch(`${config.apiUrl}/users/${user.id}`, requestOptions).then(handleResponse);
+    return fetch(`${config.apiUrl}/profile/`, requestOptions).then(handleResponse);
 }
 
+//TODO: implement
 function swipe(user, choice) {
     const requestOptions = {
         method: 'POST',
-        headers: authHeader()
     };
-    //TODO: complete
     return
 }
 
-// prefixed function name with underscore because delete is a reserved word in javascript
+// delete is a reserved word in javascript
+//TODO: modify
 function _delete(id) {
     const requestOptions = {
         method: 'DELETE',
@@ -100,6 +100,8 @@ function getData() {
     const requestOptions = {
         method: 'GET'
     };
+
+    return fetch(`${config.apiUrl}/profile`)
 
 }
 
