@@ -78,6 +78,10 @@ paths:
           description: Server error
 
 
+  ######################
+  #####   Profile  #####
+  ######################
+
   /profile:
     get:
       operationId: Profile.service.getMyProfile
@@ -129,7 +133,60 @@ paths:
                 $ref: '#/components/schemas/ProfileResponse'
         422:
           description: User not found!
-          
+
+
+  ######################
+  #####   Secrets  #####
+  ######################
+
+
+  /secret:
+    post:
+      operationId: Secrets.service.createSecret
+      tags: [Secret, POST]
+      summary: Creates secret.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Secret'
+      responses:
+        201:
+          description: Secret Created.
+        422:
+          description: Secret Exists!
+        500:
+          description: Database error!
+    get:
+      operationId: Secrets.service.getSecrets
+      tags: [Secret, GET]
+      summary: Obtains secrets.
+      responses:
+        200:
+          description: Secret found.
+        500:
+          description: Database error!
+
+
+  /secret/{protocolId}:
+    get:
+      operationId: Secrets.service.getSecret
+      tags: [Secret, GET]
+      summary: Obtains secret.
+      parameters:
+        - in: path
+          name: protocolId
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: Secret found.
+        422:
+          description: Secret not found!
+        500:
+          description: Database error!
 components:
   schemas:
     ### Authetication
@@ -202,7 +259,23 @@ components:
               type: string
             phone:
               type: string
+    Secret:
+      type: object
+      properties:
+        username:
+          type: string
+        protocolId:
+          type: string
+        data:
+          type: string
+      required: [username, protocolId, data]
 
+    SecretRequest:
+      type: object
+      properties:
+        protocolId:
+          type: string
+      required: [protocolId]
 #   /auth/isLogged:
 #     get:
 #       operationId: endpoints.authentication.isLogged
@@ -214,9 +287,7 @@ components:
 #         401:
 #           description: User not logged in
 #
-#   ######################
-#   ####  APPLICATION  ###
-#   ######################
+
 #   /measurements:
 #     post:
 #       operationId: endpoints.application.addMeasurements
