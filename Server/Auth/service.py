@@ -18,8 +18,8 @@ def login(body):
     user = getUser(username)
     if user is not None and bcrypt.checkpw(password.encode(), user.password):
         login_user(user, remember=True)
-        return make_response(f'{username}', 200)
-    return make_response('Login failed', 401)
+        return make_response({"Logged" : f"{username}"}, 200)
+    return make_response({"Message" : 'Login failed'}, 401)
 
 
 def register(body):
@@ -30,7 +30,7 @@ def register(body):
     
     salt = body.get('salt')
     if getUser(username).username is not None:
-        return make_response({"Message" :'Username already in use'}, 400)
+        return make_response({"Message" : 'Username already in use'}, 400)
 
     # Password hashing
     passwordSalt = bcrypt.gensalt()
