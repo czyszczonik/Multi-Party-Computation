@@ -215,6 +215,138 @@ paths:
           description: Pairs retrieved.
         500:
           description: Database error!
+
+  ######################
+  #####   PROTOLS  #####
+  ######################
+
+  /protocol:
+    get:
+      operationId: Protocol.service.getActiveProtocolsForUser
+      tags: [PROTOLS, GET]
+      summary: Obtains active protocol list.
+      responses:
+        200:
+          description: Protocols retrieved.
+        500:
+          description: Database error!
+
+  /protocol/{protocolID}:
+    get:
+      operationId: Protocol.service.getProtocolDataById
+      tags: [PROTOLS, GET]
+      summary: Obtains active protocol list.
+      parameters:
+        - in: path
+          name: protocolID
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: Protocols retrieved.
+        401:
+          description: Unauthorized!
+        500:
+          description: Database error!
+
+  /protocol/name/{name}:
+    get:
+      operationId: Protocol.service.getProtocolDataByName
+      tags: [PROTOLS, GET]
+      summary: Obtains active protocol for name.
+      parameters:
+        - in: path
+          name: name
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: Protocols retrieved.
+        401:
+          description: Unauthorized!
+        500:
+          description: Database error!
+
+  /protocol/step1:
+    post:
+      operationId: Protocol.service.initProtocol
+      tags: [PROTOLS, POST]
+      summary: First round!
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/initProtocol'
+      responses:
+        201:
+          description: Protocols created.
+        401:
+          description: Unauthorized!
+        422:
+          description: Protocol Existis!
+        500:
+          description: Database error!
+
+  /protocol/step2:
+    post:
+      operationId: Protocol.service.respondProtocol
+      tags: [PROTOLS, POST]
+      summary: Second round!
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/respondProtocol'
+      responses:
+        201:
+          description: Protocols created.
+        401:
+          description: Unauthorized!
+        500:
+          description: Database error!
+
+  /protocol/step3:
+    post:
+      operationId: Protocol.service.thirdRoundProtocol
+      tags: [PROTOLS, POST]
+      summary: Third round!
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/thirdProto'
+      responses:
+        204:
+          description: Protocols Updated.
+        401:
+          description: Unauthorized!
+        500:
+          description: Database error!
+
+  /protocol/step4:
+    post:
+      operationId: Protocol.service.fourthRoundProtocol
+      tags: [PROTOLS, POST]
+      summary: Fourth round!
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/fourthProro'
+      responses:
+        204:
+          description: Protocols Updated.
+        401:
+          description: Unauthorized!
+        500:
+          description: Database error!
+
 components:
   schemas:
     ### Authetication
@@ -304,6 +436,60 @@ components:
         protocolId:
           type: string
       required: [protocolId]
+
+    initProtocol:
+      type: object
+      properties:
+        iniciator:
+          type: string
+        responder:
+          type: string
+        encryptions:
+          type: array
+        iniciatorChoice:
+          type: string
+        iniciatorLabels:
+          type: array
+        pubKey:
+          type: string
+        iniciatorMessages:
+          type: array
+      required: [iniciator, responder, encryptions, iniciatorChoice, iniciatorLabels, pubKey, iniciatorMessages]
+
+    respondProtocol:
+      type: object
+      properties:
+        responder:
+          type: string
+        protocolID:
+          type: string
+        v:
+          type: string
+      required: [responder, protocolID, v]
+
+    thirdProto:
+      type: object
+      properties:
+        iniciator:
+          type: string
+        protocolID:
+          type: string
+        iniciatorChecks:
+          type: string
+      required: [iniciator, protocolID, iniciatorChecks]
+
+    fourthProro:
+      type: object
+      properties:
+        responder:
+          type: string
+        protocolID:
+          type: string
+        responderLabels:
+          type: array
+      required: [responder, protocolID, responderLabels]
+
+
 #   /auth/isLogged:
 #     get:
 #       operationId: endpoints.authentication.isLogged

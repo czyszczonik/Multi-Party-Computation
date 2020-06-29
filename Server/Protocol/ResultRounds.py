@@ -12,35 +12,3 @@ class ResultRound1():
 
     def toDictionary(self):
         return self.__dict__
-
-
-class ResultRound2():
-    def __init__(self, user, protocolID, v):
-        self.user = user
-        self.protocolID = protocolID
-        self.v = v
-        self.round = 2
-
-    def toDictionary(self):
-        return self.__dict__
-
-
-class ResultRound3():
-    def __init__(self, user, protocolID, iniciatorChecks):
-        self.iniciatorChecks = iniciatorChecks
-        self.user = user
-        self.protocolID = protocolID
-        self.round = 3
-
-    def toDictionary(self):
-        return self.__dict__
-
-class ResultRound4():
-    def __init__(self, user, protocolID, responderLabels):
-        self.responderLabels = responderLabels
-        self.user = user
-        self.protocolID = protocolID
-        self.round = 4
-
-    def toDictionary(self):
-        return self.__dict__

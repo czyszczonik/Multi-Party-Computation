@@ -7,7 +7,7 @@ from .Profile import Profile
 def getPairs(user):
     client = getMongoClient()
     resultUsers = client.result.find({ "$and" : [{ "$or": [ {'user1': f"{user}"},{'user2': f"{user}"}]}, {"result" : 1}]})
-    openProtocols = getProtolsForUser(user)
+    openProtocols = client.protocol.find({ "$or": [ {'iniciator': f"{name}"},{'responder': f"{name}"}]})
     names = getNames(user, resultUsers, openProtocols)
     names.append(user)
     profiles = client.profile.find()
@@ -27,7 +27,6 @@ def getResultsForUser(user):
     for name in names:
         prof = client.profile.find_one({"username" : name})
         results.append(Profile(prof).toDictionary())
-    print(results)
     return results
 
 
@@ -35,10 +34,6 @@ def putResult(user1, user2, result):
     client = getMongoClient()
     data = Result(user1, user2, result).toDictionary()
     client.result.insert_one(data)
-
-
-def getProtolsForUser(user):
-    return []
 
 
 def findResults(user1, user2):

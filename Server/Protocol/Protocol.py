@@ -1,4 +1,4 @@
-from RoundData import RoundData2, RoundData3, RoundData4
+from .RoundData import RoundData2, RoundData3, RoundData4
 class Protocol:
     def __init__(self, data):
         self.iniciator = data.get('iniciator', {})
@@ -29,3 +29,19 @@ class Protocol:
             if self.iniciatorLabels[key] in self.responderLabels:
                 res = int(key[1])
         return res
+
+    def isTurn(self, name):
+        if name == self.iniciator:
+            return self.round == 2
+        elif name == self.responder:
+            return self.round == 1 or self.round == 3
+
+    def getData(self):
+        if self.round == 1:
+            return getRoundData2()
+        elif self.round == 2:
+            return getRoundData3()
+        elif self.round == 4:
+            return getRoundData3()
+        else:
+            return self
