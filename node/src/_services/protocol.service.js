@@ -1,22 +1,25 @@
 import config from 'config';
 import { stringify } from 'querystring';
+import { enc } from 'crypto-js';
+import { PassThrough } from 'stream';
 
 const crypto = require('crypto');
 const CryptoJS = require('crypto-js');
-var AES = CryptoJS.AES//require("crypto-js/aes");
-var sha512 = CryptoJS.SHA512;
-var sha256 = CryptoJS.SHA256;
+const AES = CryptoJS.AES;
+const RSA = require('node-rsa');
+
 
 export const protocolService = {
     initializeProtocol,
-    // getCLabels,
-    // obliviousTransferRound1,
-    // startResponding,
-    // obliviousTransferRound2,
-    // obliviousTransferRound3,
-    // obliviousTransferRound4,
-    // findOutputLabels,
-    // getResultLabels
+    getCLabels,
+    obliviousTransferRound1,
+    startResponding,
+    obliviousTransferRound2,
+    obliviousTransferRound3,
+    obliviousTransferRound4,
+    findOutputLabels,
+    getResultLabel,
+    __testProtocol
 };
 
 //Potential try-catch
@@ -25,6 +28,7 @@ function _getProtocolData(protocolId) {
 }
 
 function _setProtocolData(protocolId, obj) {
+    // console.log(obj);
     localStorage.setItem('protocolInformation-'+protocolId, JSON.stringify(obj));
 }
 
@@ -35,7 +39,7 @@ function _dec2hex (dec) {
 function _getRandomString(length) {
     var arr = new Uint8Array((length) / 2)
     window.crypto.getRandomValues(arr)
-    return Array.from(arr, dec2hex).join('')
+    return Array.from(arr, _dec2hex).join('')
   }
 
 var JsonFormatter = {
@@ -121,38 +125,42 @@ function _initEncryptionTable(labels){
     var k11 = labels['a1']+labels['b1'];
 
     //TODO: check correctness
-    var e00 = AES.encrypt(labels['c0'], k00, {
-        format: JsonFormatter
-    });
-    var e01 = AES.encrypt(labels['c0'], k01, {
-        format: JsonFormatter
-    });
-    var e10 = AES.encrypt(labels['c0'], k10, {
-        format: JsonFormatter
-    });
-    var e11 = AES.encrypt(labels['c1'], k11, {
-        format: JsonFormatter
-    });
+    // var e00 = AES.encrypt(JSON.stringify(labels['c0']), k00, {
+    //     format: JsonFormatter
+    // });
+    // var e01 = AES.encrypt(JSON.stringify(labels['c0']), k01, {
+    //     format: JsonFormatter
+    // });
+    // var e10 = AES.encrypt(JSON.stringify(labels['c0']), k10, {
+    //     format: JsonFormatter
+    // });
+    // var e11 = AES.encrypt(JSON.stringify(labels['c1']), k11, {
+    //     format: JsonFormatter
+    // });  
+
+    var e00 = AES.encrypt(labels['c0'], k00).toString();
+    var e01 = AES.encrypt(labels['c0'], k01).toString();
+    var e10 = AES.encrypt(labels['c0'], k10).toString();
+    var e11 = AES.encrypt(labels['c1'], k11).toString();  
 
     var encryptions = [e00, e01, e10, e11];
     var shuffled = _shuffle(encryptions);
-
     return shuffled;
 }
 
 function initializeProtocol(protocolId, choice) {
     var data = {};
     data.labels = _getGateLabels();
-    encryptionTable = _initEncryptionTable(protocolId);
+    var encryptionTable = _initEncryptionTable(data.labels);
     //TODO: maybe save a choice?
-    choiceLabel = choice == 0 ? data.labels['c0'] : data.labels['c1'];
+    var choiceLabel = choice == 0 ? data.labels['a0'] : data.labels['a1'];
     
-    _setProtocolData(bob, data);
+    _setProtocolData(protocolId, data);
     return [encryptionTable, choiceLabel];
 }
 
 function getCLabels(protocolId) {
-    data = _getProtocolData(protocolId);
+    var data = _getProtocolData(protocolId);
     var cLabels = {
         c0: data.labels['c0'],
         c1: data.labels['c1']
@@ -160,16 +168,75 @@ function getCLabels(protocolId) {
     return cLabels;
 }
 
+function bnToBuf(bn) {
+    var hex = BigInt(bn).toString(16);
+    if (hex.length % 2) { hex = '0' + hex; }
+  
+    var len = hex.length / 2;
+    var u8 = new Uint8Array(len);
+  
+    var i = 0;
+    var j = 0;
+    while (i < len) {
+      u8[i] = parseInt(hex.slice(j, j+2), 16);
+      i += 1;
+      j += 2;
+    }
+  
+    return u8;
+}
+
+function bufToBn(buf) {
+    var hex = [];
+    var u8 = Uint8Array.from(buf);
+  
+    u8.forEach(function (i) {
+      var h = i.toString(16);
+      if (h.length % 2) { h = '0' + h; }
+      hex.push(h);
+    });
+  
+    return BigInt('0x' + hex.join(''));
+}
+
+var modexp = function(a, b, mod) {
+    a = a % mod;
+    var result = BigInt(1);
+    var x = a;
+  
+    while(b > 0){
+      var leastSignificantBit = b % BigInt(2);
+      b = b / BigInt(2);
+  
+      if (leastSignificantBit == 1) {
+        result = result * x;
+        result = result % mod;
+      }
+  
+      x = x * x;
+      x = x % mod;
+    }
+    return result;
+  };
+
 function obliviousTransferRound1(protocolId) {
-    data = _getProtocolData(protocolId);
-    x0 = crypto.randomBytes(16);
-    x1 = crypto.randomBytes(16);
-    // https://github.com/travist/jsencrypt
-    //TODO: implement
-    // data.otRandoms = [x0, x1]
-    // rsa = RSA.generate(1024) 
-    // self.rsa[protocolId] = rsa
-    // return (rsa.n, rsa.e),(x0, x1)
+    var data = _getProtocolData(protocolId);
+    var x0 = bufToBn(crypto.randomBytes(16)).toString(16);
+    var x1 = bufToBn(crypto.randomBytes(16)).toString(16);
+    data.otRandoms = [x0, x1];
+    var rsa = new RSA();
+    rsa.generateKeyPair(); 
+    var n = BigInt(rsa.keyPair.n.toString()).toString(16);
+    var d = BigInt(rsa.keyPair.d.toString()).toString(16);
+    var e = BigInt(rsa.keyPair.e).toString(16);
+    data.rsa = {
+        n: n.toString(16),
+        d: d.toString(16),
+        e: e.toString(16)
+    };
+
+    _setProtocolData(protocolId, data);
+    return [[n, e], [x0, x1]];
 }
 
 /////////////////////////////////////////////////////////////
@@ -177,84 +244,131 @@ function obliviousTransferRound1(protocolId) {
 
 function startResponding(protocolId, encryptions, mychoice, otherChoice) {
     var data = {};
-    data.encryptions = encryptions;
+    data.encryptions = encryptions//.map(JsonFormatter.stringify);
     data.otherChoice = otherChoice;
     data.choice = mychoice;
     _setProtocolData(protocolId, data);
 }
 
-
 function obliviousTransferRound2(protocolId, pubKey, messages) {
     var data = _getProtocolData(protocolId);
-    var n = pubKey[0];
-    var e = pubKey[1];
-    //TODO: implement
-    // if data.choice in [0,1]:
-    //     k = get_random_bytes(16)
-    //     self.k[name] = k
-    //     k = int(k.hex(), 16)
-    //     xb = int(messages[self.choices[name]].hex(), 16)
-    //     v = (xb+pow(k, e, n)) % n
-    //     #TODO: convert v back to byte array (then convert to int in round3)
-    //     return v
-    // else:
-    //     pass #TODO: handle unexpected situation
+    var n = BigInt('0x'+pubKey[0]);
+    var e = BigInt('0x'+pubKey[1]);
+    if (data.choice == 0 || data.choice == 1) {
+        var k = bufToBn(crypto.randomBytes(16));
+        data.k = k.toString(16);
+        var xb = BigInt('0x'+messages[data.choice]);
+        var val = modexp(k, e, n);
+        var v = xb+val
+        _setProtocolData(protocolId, data);
+        return v.toString(16)
+    }
+    else {
+        console.log(`Critical error, OT round 2. Protocol ID ${protocolId}, data:`);
+        console.log(data);
+    }
+        
 }
 
 /////////////////////////////////////////////////////////////
 
 function obliviousTransferRound3(protocolId, v) {
-    //TODO: implement
-    // privKey = self.rsa[name]
-    // d = privKey.d
-    // n = privKey.n
-    // tempMessages = self.tempMessages[name]
-    // x0 = int(tempMessages[0].hex(), 16)
-    // x1 = int(tempMessages[1].hex(), 16)
+    var data = _getProtocolData(protocolId);
+    var rsaKey = data.rsa;
+    var d = BigInt('0x'+rsaKey.d);
+    var n = BigInt('0x'+rsaKey.n);
+    var tempMessages = data.otRandoms;
 
-    // k0 = pow(v-x0, d, n)
-    // k1 = pow(v-x1, d, n)
+    var x0 = BigInt('0x'+tempMessages[0]);
+    var x1 = BigInt('0x'+tempMessages[1]);
+    var v = BigInt('0x'+v);
 
-    // b0 = int(self.labels[name]['b0'].hex(), 16)
-    // b1 = int(self.labels[name]['b1'].hex(), 16)
+    var dd = v-x1;
 
-    // m0 = b0 + k0
-    // m1 = b1 + k1
+    var k0 = modexp(v-x0, d, n)
+    var k1 = modexp(v-x1, d, n)
 
-    // m0 = m0.to_bytes(1024, 'big')
-    // m1 = m1.to_bytes(1024, 'big') #TODO: can possibly be more, what then? Also bind to RSA keylength
+    var b0 = BigInt('0x'+data.labels['b0']);
+    var b1 = BigInt('0x'+data.labels['b1']);
 
-    // return (m0, m1)
+    var m0 = b0 + k0
+    var m1 = b1 + k1
+
+    return [m0.toString(16), m1.toString(16)]
 }
 
 /////////////////////////////////////////////////////////////
 
-
-
 function obliviousTransferRound4(protocolId, messages) {
     var data = _getProtocolData(protocolId);
-    //TODO: implement
-    // if self.choices[name] in [0,1]:
-    // var k = int(self.k[name].hex(), 16)
-    // var m = int(messages[self.choices[name]].hex(), 16)
-    // var mb = m - k
-    // var data.label = mb.to_bytes(16, 'big')
-    // _setProtocolData(protocolId, data);
-    //  else:
-    //     pass #TODO: handle unexpected scenario
+    if (data.choice == 0 || data.choice == 1) {
+        var k = BigInt('0x'+data.k);
+        var m = BigInt('0x'+messages[data.choice]);
+        var mb = m - k;
+        data.label = mb.toString(16)
+        _setProtocolData(protocolId, data);
+    }
 }
 
 
 function findOutputLabels(protocolId) {
     var data = _getProtocolData(protocolId);
     var key = data.otherChoice+data.label;
-    results = [];
-    for (const encryption of data.encryptions) {
-        dec = AES.decrypt(encryption, key).toString(CryptoJS.enc.Utf8);
-        if (dec != "") {
-            data.resultLabel = dec;
-            return dec
+    var dec;
+    var encryptions = data.encryptions;
+    console.log(encryptions);
+    console.log(key);
+    encryptions.forEach(function (elem) {
+        dec = CryptoJS.AES.decrypt(elem, key);
+        console.log(dec);
+        try {
+            dec = dec.toString(CryptoJS.enc.Utf8);
+            if (dec != "") {
+                console.log('succ');
+                data.resultLabel = dec;
+            }
         }
-    }
-    //TODO: assert we don't end up here
+        //TODO: deciphering sometimes throws errors - check if it's the labels' fault or something https://stackoverflow.com/questions/58111929/why-i-get-malformed-utf-8-data-error-on-crypto-js
+        catch (e){console.log('err')}
+            console.log(dec);
+    });
+    _setProtocolData(protocolId, data);
+    return data.resultLabel;
+}
+
+function getResultLabel(protocolId) {
+    var data = _getProtocolData(protocolId);
+    return data.resultLabel;
+}
+
+function __testProtocol(){
+    var aliceChoice = 1;
+    var bobChoice = 1;
+    var encryptions;
+    var ac;
+    var pubKey;
+    var OTMessages;
+
+    [encryptions, ac] = initializeProtocol('bob', aliceChoice)
+    var cLabels = getCLabels('bob');
+    [pubKey, OTMessages] = obliviousTransferRound1('bob');
+    // server.putRound1(encryptions, ac, cLabels, pubKey, aliceMessages)
+
+    // encryptions, ac, pubKey, aliceMessages = server.getRound2()
+    startResponding('alice', encryptions, bobChoice, ac)
+    var v = obliviousTransferRound2('alice', pubKey, OTMessages)
+    // server.putRound2(v)
+
+
+    // v = server.getRound3()
+    var bobMessages = obliviousTransferRound3('bob', v)
+    // server.putRound3(bobMessages)
+
+    // bobMessages = server.getRound4()
+    obliviousTransferRound4('alice', bobMessages)
+    var outputL = findOutputLabels('alice')
+    // server.putRound4(bobLabels)
+
+    console.log(cLabels);
+    console.log(outputL);
 }
