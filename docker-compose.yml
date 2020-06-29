@@ -1,9 +1,10 @@
 version: "3.1"
 services:
-  application-flask:
-    build: Server
-    ports:
-      - 5000:5000
+  # TODO
+  # application-flask:
+  #   build: Server
+  #   ports:
+  #     - 5000:5000
   application-mongodb:
     build: Data
     ports:
