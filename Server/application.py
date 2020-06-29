@@ -16,4 +16,4 @@ def load_user(username):
 connex_app.add_api('swagger.yaml')
 
 if __name__ == '__main__':
-    connex_app.run(debug=True, host='127.0.0.1', port=5000)
+    connex_app.run(debug=True, host='0.0.0.0', port=5000)
