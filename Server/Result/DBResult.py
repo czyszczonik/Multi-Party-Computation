@@ -7,7 +7,7 @@ from .Profile import Profile
 def getPairs(user):
     client = getMongoClient()
     resultUsers = client.result.find({ "$and" : [{ "$or": [ {'user1': f"{user}"},{'user2': f"{user}"}]}, {"result" : 1}]})
-    openProtocols = client.protocol.find({ "$or": [ {'iniciator': f"{name}"},{'responder': f"{name}"}]})
+    openProtocols = client.protocol.find({"$and" : [{ "$or": [ {'iniciator': f"{user}"},{'responder': f"{user}"}]},{"round": {"$nin": [1]}}]})
     names = getNames(user, resultUsers, openProtocols)
     names.append(user)
     profiles = client.profile.find()

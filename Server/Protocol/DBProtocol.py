@@ -6,7 +6,7 @@ from .ResultRounds import ResultRound1
 
 def getProtocolById(protocolID):
     client = getMongoClient()
-    return Protocol(client.protocol.find_one({"protocolID" : protocolID})).getData()
+    return Protocol(client.protocol.find_one({"protocolID" : protocolID}))
 
 
 def getProtocolByName(name1, name2):
@@ -41,6 +41,7 @@ def removeSecrets(protocolID):
 
 
 def protocolExistis(user1, user2):
+    client = getMongoClient()
     filter = { "$or": [ { "$and": [ {'iniciator': f"{user1}"},{'responder': f"{user2}"}]}, { "$and": [ {'iniciator': f"{user1}"},{'responder': f"{user2}"}]}]}
     result = client.protocol.find_one(filter)
     return result != None
@@ -74,5 +75,6 @@ def putFourthRound(protocolID, responderLabels):
 
 
 def putResult(user1, user2, result):
+    client = getMongoClient()
     result = Result(user1, user2, result)
     client.result.insert_one(result.toDictionary())

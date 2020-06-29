@@ -16,13 +16,13 @@ class Protocol:
 
 
     def getRoundData2(self):
-        return RoundData2(self.protocolID, self.encryptions, self.iniciatorChoice, self.pubKey, self.iniciatorMessages).toDictionary()
+        return RoundData2(self.protocolID, self.encryptions, self.iniciatorChoice, self.pubKey, self.iniciatorMessages)
 
     def getRoundData3(self):
-        return RoundData3(self.protocolID, self.v).toDictionary()
+        return RoundData3(self.protocolID, self.v)
 
     def getRoundData4(self):
-        return RoundData4(self.protocolID, self.iniciatorChecks).toDictionary()
+        return RoundData4(self.protocolID, self.iniciatorChecks)
 
     def computeResult(self):
         for key in self.iniciatorLabels:
@@ -32,16 +32,16 @@ class Protocol:
 
     def isTurn(self, name):
         if name == self.iniciator:
-            return self.round == 2
+            return int(self.round) == 2
         elif name == self.responder:
-            return self.round == 1 or self.round == 3
+            return int(self.round) == 1 or int(self.round) == 3
 
     def getData(self):
         if self.round == 1:
-            return getRoundData2()
+            return self.getRoundData2()
         elif self.round == 2:
-            return getRoundData3()
+            return self.getRoundData3()
         elif self.round == 4:
-            return getRoundData3()
+            return self.getRoundData3()
         else:
             return self
