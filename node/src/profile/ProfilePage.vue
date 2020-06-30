@@ -51,6 +51,7 @@ export default {
     computed: {
         ...mapState({
             account: state => state.account,
+            data: state => state.userData
         })
     },
     created () {
