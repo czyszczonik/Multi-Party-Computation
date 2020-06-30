@@ -5,13 +5,13 @@ const state = {
 };
 
 const actions = {
-    getAll({ commit }) {
+    getData({ commit }) {
         commit('getAllRequest');
 
-        userService.getAll()
+        userService.getData()
             .then(
-                users => commit('getAllSuccess', users),
-                error => commit('getAllFailure', error)
+                data => commit('getDataSuccess', data),
+                error => commit('getDataFailure', error)
             );
     },
 
@@ -23,15 +23,26 @@ const actions = {
                 user => commit('deleteSuccess', id),
                 error => commit('deleteFailure', { id, error: error.toString() })
             );
+    },
+
+    update({ commit }, userData) {
+        commit('updateRequest');
+
+        userService.update(userData)
+            .then(
+                response => commit('updateSuccess'),
+                error => commit('updateFailure', {error: error.toString()})
+            );
     }
 };
 
 const mutations = {
-    getAllRequest(state) {
+    getDataRequest(state) {
         state.all = { loading: true };
     },
-    getAllSuccess(state, users) {
-        state.all = { items: users };
+    getDataSuccess(state, userData) {
+        state.all = { userData: userData };
+        //TODO: ??
     },
     getAllFailure(state, error) {
         state.all = { error };
@@ -60,6 +71,15 @@ const mutations = {
 
             return user;
         })
+    },
+    updateRequest(state) {
+        state.all = { loading: true };
+    },
+    updateSuccess(state) {
+        state.all = { loading: false};
+    },
+    updateFailure(state, error) {
+        state.all = { loading: false}; //TODO: handle the error message
     }
 };
 

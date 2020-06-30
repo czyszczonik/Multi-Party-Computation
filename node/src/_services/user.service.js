@@ -77,7 +77,7 @@ function update(userData) {
         body: JSON.stringify(userData)
     };
 
-    return fetch(`${config.apiUrl}/profile/`, requestOptions).then(handleResponse);
+    return fetch(`${config.apiUrl}/profile`, requestOptions).then(handleResponse);
 }
 
 //TODO: implement
@@ -103,7 +103,6 @@ function getData() {
     const requestOptions = {
         method: 'GET'
     };
-
     return fetch(`${config.apiUrl}/profile`)
 
 }

@@ -124,20 +124,6 @@ function _initEncryptionTable(labels){
     var k10 = labels['a1']+labels['b0'];
     var k11 = labels['a1']+labels['b1'];
 
-    //TODO: check correctness
-    // var e00 = AES.encrypt(JSON.stringify(labels['c0']), k00, {
-    //     format: JsonFormatter
-    // });
-    // var e01 = AES.encrypt(JSON.stringify(labels['c0']), k01, {
-    //     format: JsonFormatter
-    // });
-    // var e10 = AES.encrypt(JSON.stringify(labels['c0']), k10, {
-    //     format: JsonFormatter
-    // });
-    // var e11 = AES.encrypt(JSON.stringify(labels['c1']), k11, {
-    //     format: JsonFormatter
-    // });  
-
     var e00 = AES.encrypt(labels['c0'], k00).toString();
     var e01 = AES.encrypt(labels['c0'], k01).toString();
     var e10 = AES.encrypt(labels['c0'], k10).toString();
@@ -244,7 +230,7 @@ function obliviousTransferRound1(protocolId) {
 
 function startResponding(protocolId, encryptions, mychoice, otherChoice) {
     var data = {};
-    data.encryptions = encryptions//.map(JsonFormatter.stringify);
+    data.encryptions = encryptions;
     data.otherChoice = otherChoice;
     data.choice = mychoice;
     _setProtocolData(protocolId, data);
@@ -316,11 +302,11 @@ function findOutputLabels(protocolId) {
     var key = data.otherChoice+data.label;
     var dec;
     var encryptions = data.encryptions;
-    console.log(encryptions);
-    console.log(key);
+    // console.log(encryptions);
+    // console.log(key);
     encryptions.forEach(function (elem) {
         dec = CryptoJS.AES.decrypt(elem, key);
-        console.log(dec);
+        // console.log(dec);
         try {
             dec = dec.toString(CryptoJS.enc.Utf8);
             if (dec != "") {
@@ -330,7 +316,7 @@ function findOutputLabels(protocolId) {
         }
         //TODO: deciphering sometimes throws errors - check if it's the labels' fault or something https://stackoverflow.com/questions/58111929/why-i-get-malformed-utf-8-data-error-on-crypto-js
         catch (e){console.log('err')}
-            console.log(dec);
+            // console.log(dec);
     });
     _setProtocolData(protocolId, data);
     return data.resultLabel;
