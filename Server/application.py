@@ -1,16 +1,11 @@
 import config
-from Auth.DBAuthHandler import getUser
+from flask_jwt_extended import JWTManager
 
 # Get the application instance
 connex_app = config.connex_app
 flask_app = connex_app.app
+flask_app = JWTManager(flask_app)
 
-# Configuring login functionality
-config.lm.init_app(flask_app)
-
-@config.lm.user_loader
-def load_user(username):
-    return getUser(username)
 
 # Read the swagger.yml file to configure the endpoints
 connex_app.add_api('swagger.yaml')

@@ -5,7 +5,6 @@ from .Result import Result
 import json
 
 
-@login_required
 def getActiveProtocolsForUser():
     username = current_user.username
     try:
@@ -18,7 +17,6 @@ def getActiveProtocolsForUser():
         return make_response({"Message": 'Database Error!'} , 500)
 
 
-@login_required
 def getProtocolDataById(protocolID):
     username = current_user.username
     try:
@@ -33,7 +31,6 @@ def getProtocolDataById(protocolID):
         return make_response({"Message": 'Unauthorized!'} , 401)
 
 
-@login_required
 def getProtocolDataByName(name):
     username = current_user.username
     try:
@@ -46,7 +43,6 @@ def getProtocolDataByName(name):
         return make_response({"Message": 'Database Error!'} , 500)
 
 
-@login_required
 def initProtocol(body):
     username = current_user.username
     if body.get("iniciator") != username:
@@ -60,7 +56,7 @@ def initProtocol(body):
         return make_response({"Message": 'Database Error!'} , 500)
 
 
-@login_required
+
 def respondProtocol(body):
     username = current_user.username
     id = body.get("protocolID")
@@ -77,7 +73,7 @@ def respondProtocol(body):
         return make_response({"Message": 'Database Error!'} , 500)
 
 
-@login_required
+
 def thirdRoundProtocol(body):
     username = current_user.username
     id = body.get("protocolID")
@@ -93,7 +89,7 @@ def thirdRoundProtocol(body):
     except:
         return make_response({"Message": 'Database Error!'} , 500)
 
-@login_required
+
 def fourthRoundProtocol(body):
     username = current_user.username
     id = body.get("protocolID")

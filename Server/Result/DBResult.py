@@ -14,6 +14,7 @@ def getPairs(user):
     result = []
     for profile in profiles:
         prof = Profile(profile)
+        prof.phone = ''
         if prof.username not in names:
             result.append(prof.toDictionary())
     return result

@@ -1,8 +1,9 @@
-from .DBAuthHandler import getSalt, getUser, createUser
+from .DBAuthHandler import getSalt, getUser, createUser, getUserProfile
 from .User import User
 from .Profile import Profile
-from flask import make_response
+from flask import make_response, jsonify
 from flask_login import login_required, login_user, current_user, logout_user
+from flask_jwt_extended import create_access_token
 import bcrypt
 
 def salt(username):
@@ -16,9 +17,21 @@ def login(body):
     username = body.get('username')
     password = body.get('password')
     user = getUser(username)
+    userProfile = getUserProfile(username)
     if user is not None and bcrypt.checkpw(password.encode(), user.password):
-        login_user(user, remember=True)
-        return make_response({"Logged" : f"{username}"}, 200)
+        access_token = create_access_token(identity=username)
+        userData = {
+            'username': username or '',
+            'firstName': userProfile.firstName or '',
+            'lastName': userProfile.lastName or '',
+            'age': userProfile.age or '',
+            'bio': userProfile.bio or '',
+            'imageUrl': userProfile.imageUrl or '',
+            'phone': userProfile.phone or '',
+            'access_token': access_token
+        }
+        response = make_response(jsonify(userData), 200)
+        return response
     return make_response({"Message" : 'Login failed'}, 401)
 
 
@@ -44,7 +57,6 @@ def register(body):
     return make_response({"Message" : 'Registration successful'}, 200)
 
 
-@login_required
 def logout():
-    logout_user()
+    # logout_user() TODO: invalidate token
     return make_response('', 200)

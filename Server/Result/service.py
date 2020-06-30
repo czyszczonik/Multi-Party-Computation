@@ -4,7 +4,7 @@ from flask import make_response
 import json
 
 
-@login_required
+# @login_required
 def getMatchedPairs():
     username = current_user.username
     try:
@@ -17,11 +17,13 @@ def getMatchedPairs():
         return make_response({"Message": 'Database Error!'} , 500)
 
 
-@login_required
+# @login_required
 def getUnmatchedPairs():
-    username = current_user.username
+    # username = current_user.username
+    username = "admin1"
+
     try:
-        results = getPairs(username)
+        results = getPairs(username) #username, last name, first name, age, bio
         results = json.dumps(results)
         response = make_response(results, 200)
         response.headers['Content-type']= 'application/json'

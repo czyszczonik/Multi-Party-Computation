@@ -8,6 +8,7 @@ import App from './app/App';
 
 Vue.use(VeeValidate);
 Vue.use(VueImg);
+Vue.use(require('vue-cookies'));
 
 // import { configureFakeBackend } from './_helpers/fake-backend';
 // configureFakeBackend();

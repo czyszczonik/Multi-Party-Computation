@@ -217,13 +217,13 @@ paths:
           description: Database error!
 
   ######################
-  #####   PROTOLS  #####
+  #####   PROTOCOL  #####
   ######################
 
   /protocol:
     get:
       operationId: Protocol.service.getActiveProtocolsForUser
-      tags: [PROTOLS, GET]
+      tags: [PROTOCOLS, GET]
       summary: Obtains active protocol list.
       responses:
         200:
@@ -234,7 +234,7 @@ paths:
   /protocol/{protocolID}:
     get:
       operationId: Protocol.service.getProtocolDataById
-      tags: [PROTOLS, GET]
+      tags: [PROTOCOLS, GET]
       summary: Obtains active protocol list.
       parameters:
         - in: path
@@ -253,7 +253,7 @@ paths:
   /protocol/name/{name}:
     get:
       operationId: Protocol.service.getProtocolDataByName
-      tags: [PROTOLS, GET]
+      tags: [PROTOCOLS, GET]
       summary: Obtains active protocol for name.
       parameters:
         - in: path
@@ -272,7 +272,7 @@ paths:
   /protocol/step1:
     post:
       operationId: Protocol.service.initProtocol
-      tags: [PROTOLS, POST]
+      tags: [PROTOCOLS, POST]
       summary: First round!
       requestBody:
         required: true
@@ -293,7 +293,7 @@ paths:
   /protocol/step2:
     post:
       operationId: Protocol.service.respondProtocol
-      tags: [PROTOLS, POST]
+      tags: [PROTOCOLS, POST]
       summary: Second round!
       requestBody:
         required: true
@@ -312,7 +312,7 @@ paths:
   /protocol/step3:
     post:
       operationId: Protocol.service.thirdRoundProtocol
-      tags: [PROTOLS, POST]
+      tags: [PROTOCOL, POST]
       summary: Third round!
       requestBody:
         required: true
@@ -331,7 +331,7 @@ paths:
   /protocol/step4:
     post:
       operationId: Protocol.service.fourthRoundProtocol
-      tags: [PROTOLS, POST]
+      tags: [PROTOCOL, POST]
       summary: Fourth round!
       requestBody:
         required: true
@@ -389,7 +389,6 @@ components:
           type: string
       required: [username, password]
 
-
     ProfileResponse:
           type: object
           properties:
@@ -407,12 +406,14 @@ components:
               type: string
             phone:
               type: string
+            token:
+              type: string
 
     ProfileUpdate:
           type: object
           properties:
             age:
-              type: integer
+              type: string
             bio:
               type: string
             imageUrl:

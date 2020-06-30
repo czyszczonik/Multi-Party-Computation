@@ -1,6 +1,7 @@
 import pymongo
 from .User import User
 from .Client import getMongoClient
+from .Profile import Profile
 
 client = getMongoClient()
 
@@ -10,6 +11,10 @@ def createUser(user, profil):
 
 def getUser(username):
     return User(client.users.find_one({"username" : f"{username}"}))
+
+def getUserProfile(username):
+    print( client.profile.find_one({"username" : f"{username}"}))
+    return Profile(client.profile.find_one({"username" : f"{username}"}))
 
 def getSalt(username):
     user = getUser(username)

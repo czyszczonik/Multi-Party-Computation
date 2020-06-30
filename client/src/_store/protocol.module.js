@@ -1,47 +1,14 @@
-import { userService } from '../_services';
+import { protocolService } from '../_services';
+import { secretsService } from '../_services';
+import { apiService } from '../_services';
 
 const state = {
-    all: {}
+    protocols: {}
 };
 
 const actions = {
-    getData({ commit }) {
-        commit('getDataRequest');
-
-        userService.getData()
-            .then(
-                data => commit('getDataSuccess', data),
-                error => commit('getDataFailure', error)
-            );
-    },
-
-    delete({ commit }, id) {
-        commit('deleteRequest', id);
-
-        userService.delete(id)
-            .then(
-                user => commit('deleteSuccess', id),
-                error => commit('deleteFailure', { id, error: error.toString() })
-            );
-    },
-
-    update({ commit, state }, userData) {
-        commit('updateRequest');
-
-        userService.update(userData)
-            .then(
-                response => commit('updateSuccess'),
-                error => commit('updateFailure', {error: error.toString()})
-            );
-    },
-
-    getAll({ commit, state}) {
-        userService.getAll()
-            .then(
-                response => commit('getAllSuccess', response),
-                error => commit('getAllFailure', {error: error.toString()})
-
-            )
+    getProtocols( {dispatch, commit }) {
+        return apiService.protocols();
     }
 };
 
@@ -98,7 +65,7 @@ const mutations = {
     },
 };
 
-export const users = {
+export const protocol = {
     namespaced: true,
     state,
     actions,

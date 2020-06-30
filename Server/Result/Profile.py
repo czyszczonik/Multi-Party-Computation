@@ -5,13 +5,13 @@ class Profile():
             return
         if firstName is None:
             dict = username
-            self.username = dict.get('username', {})
-            self.firstName = dict.get('firstName', {})
-            self.lastName = dict.get('lastName', {})
-            self.age = dict.get('age', {})
-            self.bio = dict.get('bio', {})
-            self.imageUrl = dict.get('imageUrl', {})
-            self.phone = dict.get('phone', {})
+            self.username = dict.get('username', "")
+            self.firstName = dict.get('firstName', "")
+            self.lastName = dict.get('lastName', "")
+            self.age = dict.get('age', "")
+            self.bio = dict.get('bio', "")
+            self.imageUrl = dict.get('imageUrl', "")
+            self.phone = dict.get('phone', "")
         else:
             self.username = username
             self.firstName = firstName

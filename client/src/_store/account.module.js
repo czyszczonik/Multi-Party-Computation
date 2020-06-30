@@ -23,7 +23,7 @@ const actions = {
     },
     logout({ commit }) {
         userService.logout();
-        localStorage.clear();
+        // localStorage.clear();
         commit('logout');
     },
     register({ dispatch, commit }, user) {
@@ -47,7 +47,7 @@ const actions = {
     },
     getSalt({ dispatch, commit }, username) {
         return userService.getSalt(username);
-    }
+    },
 };
 
 const mutations = {

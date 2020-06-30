@@ -1,6 +1,5 @@
 import config from 'config';
 import { authHeader } from '../_helpers'; 
-import { stringify } from 'querystring';
 
 const crypto = require('crypto');
 var sha512 = require('crypto-js/sha512');
@@ -19,22 +18,23 @@ export const userService = {
 };
 
 function login(username, pass, salt) {
-    var password = sha512(pass+salt);
-    var secretPassword = sha256(salt+pass);
+    var password = sha512(pass+salt).toString();
+    var secretPassword = sha256(salt+pass).toString();
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: "include",
         body: JSON.stringify({ username, password })
     };
 
     return fetch(`${config.apiUrl}/auth/login`, requestOptions)
         .then(handleResponse)
-        .then(
-            user => {
-                if (user.username) {
+        .then(user => {
+                if (user.username) { //TODO: change
                     localStorage.setItem('user', JSON.stringify(user));
                     localStorage.setItem('secretPassword', secretPassword);
                 }
+                return user;
             }
         );
 }
@@ -44,18 +44,27 @@ function logout() {
     const requestOptions = {
         method: 'GET',
     };
+    localStorage.removeItem('user')
     return fetch(`${config.apiUrl}/auth/logout`);
 }
 
 function register(user) {
     user.salt = crypto.randomBytes(128).toString('base64')
-    user.password = sha512(user.password+user.salt)
+    var password = sha512(user.password+user.salt).toString();
+
+    var userData = {
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        salt: user.salt,
+        password: password
+    };
 
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(user)
-    };
+        body: JSON.stringify(userData)
+    };  
 
     return fetch(`${config.apiUrl}/auth/register`, requestOptions).then(handleResponse);
 
@@ -67,13 +76,13 @@ function getAll() {
         headers: authHeader()
     };
 
-    return fetch(`${config.apiUrl}/users`, requestOptions).then(handleResponse);
+    return fetch(`${config.apiUrl}/pair/new`, requestOptions).then(handleResponse);
 }
 
 function update(userData) {
     const requestOptions = {
         method: 'PUT',
-        headers: {'Content-Type': 'application/json' },
+        headers: { ...authHeader(), 'Content-Type': 'application/json' },
         body: JSON.stringify(userData)
     };
 
@@ -84,6 +93,7 @@ function update(userData) {
 function swipe(user, choice) {
     const requestOptions = {
         method: 'POST',
+        headers: { ...authHeader(), 'Content-Type': 'application/json' },
     };
     return
 }
@@ -101,7 +111,8 @@ function _delete(id) {
 
 function getData() {
     const requestOptions = {
-        method: 'GET'
+        method: 'GET',
+        headers: authHeader()
     };
     return fetch(`${config.apiUrl}/profile`)
 
@@ -109,7 +120,7 @@ function getData() {
 
 function getSalt(username) {
     const requestOptions = {
-        method: 'GET'
+        method: 'GET',
     };
 
     return fetch(`${config.apiUrl}/auth/salt/${username}`, requestOptions).then(handleResponse);
@@ -119,11 +130,11 @@ function handleResponse(response) {
     return response.text().then(text => {
         const data = text && JSON.parse(text);
         if (!response.ok) {
-            if (response.status === 401) {
-                // auto logout if 401 response returned from api
-                logout();
-                location.reload(true);
-            }
+            // if (response.status === 401) {
+            //     // auto logout if 401 response returned from api
+            //     logout();
+            //     location.reload(true);
+            // }
 
             const error = (data && data.message) || response.statusText;
             return Promise.reject(error);

@@ -3,7 +3,6 @@ from flask_login import login_required, current_user
 from flask import make_response
 import json
 
-@login_required
 def getSecrets():
     username = current_user.username
     try:
