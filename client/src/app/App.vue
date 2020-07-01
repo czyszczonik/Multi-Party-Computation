@@ -1,12 +1,8 @@
 <template>
     <div class="container" style="margin-top: 1em;">
         <div class="row">
-            <div class="col-sm-6 offset-sm-3">
-                <div class="jumbotron">
-                    <router-view></router-view>
-                    <div v-if="alert.message" :class="`alert ${alert.type}`">{{alert.message}}</div>
-                </div>
-            </div>
+            <router-view></router-view>
+            <div v-if="alert.message" :class="`alert ${alert.type}`">{{alert.message}}</div>
         </div>
     </div>
 

@@ -1,6 +1,5 @@
-from flask_login import UserMixin
 
-class User(UserMixin):
+class User():
     def __init__(self, user_json):
         if user_json is None:
             self.username = None

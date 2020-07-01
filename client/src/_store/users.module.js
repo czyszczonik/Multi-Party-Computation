@@ -1,7 +1,10 @@
 import { userService } from '../_services';
 
 const state = {
-    all: {}
+    all: {
+        items: {},
+        matches: {},
+    },
 };
 
 const actions = {
@@ -41,6 +44,14 @@ const actions = {
                 response => commit('getAllSuccess', response),
                 error => commit('getAllFailure', {error: error.toString()})
 
+            )
+    },
+
+    getMatches({ commit, state }){
+        userService.getMatches()
+            .then(
+                response => commit('getMatchesSuccess', response),
+                error => commit('getMatchesFailure', {error: error.toString()})
             )
     }
 };
@@ -91,9 +102,15 @@ const mutations = {
         state.all = { loading: false}; //TODO: handle the error message
     },
     getAllSuccess(state, users) {
-        state.all = { items: users };
+        state.all.items = users;
     },
     getAllFailure(state, error) {
+
+    },
+    getMatchesSuccess(state, users) {
+        state.all.matches = users;
+    },
+    getMatchesFailure(state, error) {
 
     },
 };

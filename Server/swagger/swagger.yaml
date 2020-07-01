@@ -446,15 +446,15 @@ components:
         responder:
           type: string
         encryptions:
-          type: array
+          type: string
         iniciatorChoice:
           type: string
         iniciatorLabels:
-          type: array
+          type: string
         pubKey:
           type: string
         iniciatorMessages:
-          type: array
+          type: string
       required: [iniciator, responder, encryptions, iniciatorChoice, iniciatorLabels, pubKey, iniciatorMessages]
 
     respondProtocol:
@@ -462,33 +462,33 @@ components:
       properties:
         responder:
           type: string
-        protocolID:
+        protocolId:
           type: string
         v:
           type: string
-      required: [responder, protocolID, v]
+      required: [responder, protocolId, v]
 
     thirdProto:
       type: object
       properties:
         iniciator:
           type: string
-        protocolID:
+        protocolId:
           type: string
-        iniciatorChecks:
+        messagesForResponder:
           type: string
-      required: [iniciator, protocolID, iniciatorChecks]
+      required: [iniciator, protocolId, messagesForResponder]
 
     fourthProro:
       type: object
       properties:
         responder:
           type: string
-        protocolID:
+        protocolId:
           type: string
         responderLabels:
-          type: array
-      required: [responder, protocolID, responderLabels]
+          type: string
+      required: [responder, protocolId, responderLabels]
 
 
 #   /auth/isLogged:

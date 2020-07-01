@@ -2,9 +2,9 @@ from .DBAuthHandler import getSalt, getUser, createUser, getUserProfile
 from .User import User
 from .Profile import Profile
 from flask import make_response, jsonify
-from flask_login import login_required, login_user, current_user, logout_user
 from flask_jwt_extended import create_access_token
 import bcrypt
+import datetime
 
 def salt(username):
     salt = getSalt(username)
@@ -19,7 +19,8 @@ def login(body):
     user = getUser(username)
     userProfile = getUserProfile(username)
     if user is not None and bcrypt.checkpw(password.encode(), user.password):
-        access_token = create_access_token(identity=username)
+        expires = datetime.timedelta(days=365)  
+        access_token = create_access_token(identity=username, expires_delta=expires)
         userData = {
             'username': username or '',
             'firstName': userProfile.firstName or '',
@@ -58,5 +59,4 @@ def register(body):
 
 
 def logout():
-    # logout_user() TODO: invalidate token
     return make_response('', 200)

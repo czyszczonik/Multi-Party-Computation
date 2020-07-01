@@ -10,9 +10,6 @@ def fetchSecrets(username):
     client = getMongoClient()
     filter = {"username" : f"{username}"}
     secrets = client.secret.find(filter)
-    # results = {}
-    # for element in secrets:
-    #     results[element['protocolId']] = Secret(element).toDictionary()
     results = []
     for element in secrets:
         results.append(Secret(element).toDictionary())

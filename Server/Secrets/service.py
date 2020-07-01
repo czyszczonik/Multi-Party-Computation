@@ -1,10 +1,10 @@
 from .DBSecretHandler import insertSecret, fetchSecret, fetchSecrets
-from flask_login import login_required, current_user
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask import make_response
 import json
 
 def getSecrets():
-    username = current_user.username
+    username = get_jwt_identity()
     try:
         results = fetchSecrets(username)
         results = json.dumps(results)
@@ -16,9 +16,9 @@ def getSecrets():
         return make_response({"Message": 'Database Error!'} , 500)
 
 
-@login_required
+@jwt_required
 def getSecret(protocolId):
-    username = current_user.username
+    username = get_jwt_identity()
     try:
         sec = fetchSecret(username, protocolId)
         if sec is None:
@@ -28,9 +28,9 @@ def getSecret(protocolId):
         return make_response({"Message": 'Database Error!'} , 500)
 
 
-@login_required
+@jwt_required
 def createSecret(body):
-    username = current_user.username
+    username = get_jwt_identity()
     protocolId = body.get("protocolId")
     data = body.get("data")
     try:

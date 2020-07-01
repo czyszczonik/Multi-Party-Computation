@@ -1,5 +1,4 @@
 from .DBProfileHandler import getProfileInfo, updateProfileInfo
-from flask_login import login_required, current_user
 from flask import make_response
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
@@ -7,8 +6,6 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 @jwt_required
 def getMyProfile():
     username = get_jwt_identity()
-    print(f"USERNAME: {username}")
-    username = 'admin1'
     try:
         response = getProfileInfo(username).toDictionary()
         return make_response(response, 200)
@@ -16,6 +13,7 @@ def getMyProfile():
         return make_response({"Message": 'Database Error!'} , 500)
 
 
+@jwt_required
 def getProfile(username):
     try:
         user = getProfileInfo(username)
@@ -27,9 +25,9 @@ def getProfile(username):
         return make_response({"Message": 'Database Error!'} , 500)
 
 
+@jwt_required
 def updateProfile(body):    
-    # username = current_user.username
-    username = 'admin1'
+    username = get_jwt_identity()
     profile = getProfileInfo(username)    
     imageUrl = body.get("imageUrl") or profile.imageUrl
     age = body.get("age") or profile.age

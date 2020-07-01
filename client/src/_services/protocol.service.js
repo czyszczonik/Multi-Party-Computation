@@ -19,17 +19,21 @@ export const protocolService = {
     obliviousTransferRound4,
     findOutputLabels,
     getResultLabel,
-    __testProtocol
+    __testProtocol,
+    step1,
+    step2,
+    step3,
+    step4
 };
 
 //Potential try-catch
-function _getProtocolData(protocolId) {
-    return JSON.parse(localStorage.getItem('protocolInformation-'+protocolId)); 
+function _getProtocolData(name) {
+    return JSON.parse(localStorage.getItem('protocolInformation-'+name)); 
 }
 
-function _setProtocolData(protocolId, obj) {
+function _setProtocolData(name, obj) {
     // console.log(obj);
-    localStorage.setItem('protocolInformation-'+protocolId, JSON.stringify(obj));
+    localStorage.setItem('protocolInformation-'+name, JSON.stringify(obj));
 }
 
 function _dec2hex (dec) {
@@ -134,23 +138,24 @@ function _initEncryptionTable(labels){
     return shuffled;
 }
 
-function initializeProtocol(protocolId, choice) {
+function initializeProtocol(name, choice) {
     var data = {};
     data.labels = _getGateLabels();
-    var encryptionTable = _initEncryptionTable(data.labels);
+    var encryptionTable = JSON.stringify(_initEncryptionTable(data.labels));
     //TODO: maybe save a choice?
     var choiceLabel = choice == 0 ? data.labels['a0'] : data.labels['a1'];
     
-    _setProtocolData(protocolId, data);
+    _setProtocolData(name, data);
     return [encryptionTable, choiceLabel];
 }
 
-function getCLabels(protocolId) {
-    var data = _getProtocolData(protocolId);
+function getCLabels(name) {
+    var data = _getProtocolData(name);
     var cLabels = {
         c0: data.labels['c0'],
         c1: data.labels['c1']
     };
+    cLabels = JSON.stringify(cLabels);
     return cLabels;
 }
 
@@ -205,8 +210,8 @@ var modexp = function(a, b, mod) {
     return result;
   };
 
-function obliviousTransferRound1(protocolId) {
-    var data = _getProtocolData(protocolId);
+function obliviousTransferRound1(name) {
+    var data = _getProtocolData(name);
     var x0 = bufToBn(crypto.randomBytes(16)).toString(16);
     var x1 = bufToBn(crypto.randomBytes(16)).toString(16);
     data.otRandoms = [x0, x1];
@@ -220,24 +225,37 @@ function obliviousTransferRound1(protocolId) {
         d: d.toString(16),
         e: e.toString(16)
     };
+    var pubKey = JSON.stringify([n,e]);
+    var msgs = JSON.stringify([x0,x1]);
+    _setProtocolData(name, data);
+    return [pubKey, msgs];
+}
 
-    _setProtocolData(protocolId, data);
-    return [[n, e], [x0, x1]];
+function step1(name, choice) {
+    var encryptions;
+    var ac;
+    var cLabels;
+    var pubKey;
+    var OTMessages;
+    [encryptions, ac] = initializeProtocol(name, choice);
+    cLabels = getCLabels(name);
+    [pubKey, OTMessages] = obliviousTransferRound1(name);
+    return [name, encryptions, ac, cLabels, pubKey, OTMessages]
 }
 
 /////////////////////////////////////////////////////////////
 
 
-function startResponding(protocolId, encryptions, mychoice, otherChoice) {
+function startResponding(name, encryptions, mychoice, otherChoice) {
     var data = {};
     data.encryptions = encryptions;
     data.otherChoice = otherChoice;
     data.choice = mychoice;
-    _setProtocolData(protocolId, data);
+    _setProtocolData(name, data);
 }
 
-function obliviousTransferRound2(protocolId, pubKey, messages) {
-    var data = _getProtocolData(protocolId);
+function obliviousTransferRound2(name, pubKey, messages) {
+    var data = _getProtocolData(name);
     var n = BigInt('0x'+pubKey[0]);
     var e = BigInt('0x'+pubKey[1]);
     if (data.choice == 0 || data.choice == 1) {
@@ -246,20 +264,26 @@ function obliviousTransferRound2(protocolId, pubKey, messages) {
         var xb = BigInt('0x'+messages[data.choice]);
         var val = modexp(k, e, n);
         var v = xb+val
-        _setProtocolData(protocolId, data);
+        _setProtocolData(name, data);
         return v.toString(16)
     }
     else {
-        console.log(`Critical error, OT round 2. Protocol ID ${protocolId}, data:`);
+        console.log(`Critical error, OT round 2. Protocol ID ${name}, data:`);
         console.log(data);
     }
         
 }
 
+function step2(name, encryptions, ac, pubKey, otMessages, choice) {
+    startResponding(name, encryptions, choice, ac);
+    var v = obliviousTransferRound2(name, pubKey, otMessages);
+    return v;
+}
+
 /////////////////////////////////////////////////////////////
 
-function obliviousTransferRound3(protocolId, v) {
-    var data = _getProtocolData(protocolId);
+function obliviousTransferRound3(name, v) {
+    var data = _getProtocolData(name);
     var rsaKey = data.rsa;
     var d = BigInt('0x'+rsaKey.d);
     var n = BigInt('0x'+rsaKey.n);
@@ -283,22 +307,27 @@ function obliviousTransferRound3(protocolId, v) {
     return [m0.toString(16), m1.toString(16)]
 }
 
+function step3(name, v) {
+    var messages = obliviousTransferRound3(name, v);
+    return messages;
+}
+
 /////////////////////////////////////////////////////////////
 
-function obliviousTransferRound4(protocolId, messages) {
-    var data = _getProtocolData(protocolId);
+function obliviousTransferRound4(name, messages) {
+    var data = _getProtocolData(name);
     if (data.choice == 0 || data.choice == 1) {
         var k = BigInt('0x'+data.k);
         var m = BigInt('0x'+messages[data.choice]);
         var mb = m - k;
         data.label = mb.toString(16)
-        _setProtocolData(protocolId, data);
+        _setProtocolData(name, data);
     }
 }
 
 
-function findOutputLabels(protocolId) {
-    var data = _getProtocolData(protocolId);
+function findOutputLabels(name) {
+    var data = _getProtocolData(name);
     var key = data.otherChoice+data.label;
     var dec;
     var encryptions = data.encryptions;
@@ -318,14 +347,22 @@ function findOutputLabels(protocolId) {
         catch (e){console.log('err')}
             // console.log(dec);
     });
-    _setProtocolData(protocolId, data);
+    _setProtocolData(name, data);
     return data.resultLabel;
 }
 
-function getResultLabel(protocolId) {
-    var data = _getProtocolData(protocolId);
+function getResultLabel(name) {
+    var data = _getProtocolData(name);
     return data.resultLabel;
 }
+
+function step4(name, messages) {
+    obliviousTransferRound4(name, messages);
+    var output = findOutputLabels(name);
+    return output;
+}
+
+//////////////////////////////////////////////////////////////
 
 function __testProtocol(){
     var aliceChoice = 1;

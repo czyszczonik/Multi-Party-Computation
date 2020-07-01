@@ -1,24 +1,25 @@
 from .DBProtocol import getProtocolByName, getProtocolById, protocolExistis, removeProtocol, putFirstRound, putSecondRound, putThirdRound, putResult, putFourthRound, removeSecrets, getActiveProtocols
-from flask_login import login_required, current_user
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask import make_response
 from .Result import Result
 import json
 
-
+@jwt_required
 def getActiveProtocolsForUser():
-    username = current_user.username
+    username = get_jwt_identity()
     try:
         results = getActiveProtocols(username)
         results = json.dumps(results)
         response = make_response(results, 200)
         response.headers['Content-type']= 'application/json'
         return response
-    except:
+    except Exception as e:
+        print(e)
         return make_response({"Message": 'Database Error!'} , 500)
 
-
+@jwt_required
 def getProtocolDataById(protocolID):
-    username = current_user.username
+    username = get_jwt_identity()
     try:
         results = getProtocolById(protocolID)
         if result.iniciator != username and result.responder != username:
@@ -30,21 +31,24 @@ def getProtocolDataById(protocolID):
     except:
         return make_response({"Message": 'Unauthorized!'} , 401)
 
-
+@jwt_required
 def getProtocolDataByName(name):
-    username = current_user.username
+    username = get_jwt_identity()
     try:
         results = getProtocolByName(username, name)
         results = json.dumps(results)
+        if results is "null":
+            results = {"status":"false"}
         response = make_response(results, 200)
         response.headers['Content-type']= 'application/json'
         return response
-    except:
+    except Exception as e:
+        print(e)
         return make_response({"Message": 'Database Error!'} , 500)
 
-
+@jwt_required
 def initProtocol(body):
-    username = current_user.username
+    username = get_jwt_identity()
     if body.get("iniciator") != username:
         return make_response({"Message": 'Unauthorized!'} , 401)
     if protocolExistis(username, body.get("responder")):
@@ -56,10 +60,10 @@ def initProtocol(body):
         return make_response({"Message": 'Database Error!'} , 500)
 
 
-
+@jwt_required
 def respondProtocol(body):
-    username = current_user.username
-    id = body.get("protocolID")
+    username = get_jwt_identity()
+    id = body.get("protocolId")
     if body.get("responder") != username:
         return make_response({"Message": 'Unauthorized!'} , 401)
     protocol = getProtocolById(id)
@@ -73,26 +77,26 @@ def respondProtocol(body):
         return make_response({"Message": 'Database Error!'} , 500)
 
 
-
+@jwt_required
 def thirdRoundProtocol(body):
-    username = current_user.username
-    id = body.get("protocolID")
+    username = get_jwt_identity()
+    id = body.get("protocolId")
     if body.get("iniciator") != username:
         return make_response({"Message": 'Unauthorized!'} , 401)
     protocol = getProtocolById(id)
     if not protocol.isTurn(username):
         return make_response({"Message": 'Unauthorized!'} , 401)
     try:
-        iniciatorChecks = body.get("iniciatorChecks")
-        putThirdRound(id, iniciatorChecks)
+        messagesForResponder = body.get("messagesForResponder")
+        putThirdRound(id, messagesForResponder)
         return make_response({"Message": 'Protocol Updated!'} , 204)
     except:
         return make_response({"Message": 'Database Error!'} , 500)
 
-
+@jwt_required
 def fourthRoundProtocol(body):
-    username = current_user.username
-    id = body.get("protocolID")
+    username = get_jwt_identity()
+    id = body.get("protocolId")
     if body.get("responder") != username:
         return make_response({"Message": 'Unauthorized!'} , 401)
     protocol = getProtocolById(id)
@@ -106,5 +110,5 @@ def fourthRoundProtocol(body):
         removeProtocol(id)
         removeSecrets(id)
         return make_response({"Message": 'Protocol Updated!'} , 204)
-    except:
+    except Exception as e:
         return make_response({"Message": 'Database Error!'} , 500)

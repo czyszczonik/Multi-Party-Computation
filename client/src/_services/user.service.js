@@ -14,7 +14,8 @@ export const userService = {
     delete: _delete,
     getData,
     getSalt,
-    swipe
+    swipe,
+    getMatches
 };
 
 function login(username, pass, salt) {
@@ -30,7 +31,7 @@ function login(username, pass, salt) {
     return fetch(`${config.apiUrl}/auth/login`, requestOptions)
         .then(handleResponse)
         .then(user => {
-                if (user.username) { //TODO: change
+                if (user.access_token) { //TODO: change
                     localStorage.setItem('user', JSON.stringify(user));
                     localStorage.setItem('secretPassword', secretPassword);
                 }
@@ -125,6 +126,16 @@ function getSalt(username) {
 
     return fetch(`${config.apiUrl}/auth/salt/${username}`, requestOptions).then(handleResponse);
 }
+
+function getMatches() {
+    const requestOptions = {
+        method: 'GET',
+        headers: authHeader()
+    };
+
+    return fetch(`${config.apiUrl}/pair/result`, requestOptions).then(handleResponse);
+}
+
 
 function handleResponse(response) {
     return response.text().then(text => {

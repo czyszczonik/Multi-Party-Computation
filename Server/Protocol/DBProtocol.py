@@ -9,11 +9,15 @@ def getProtocolById(protocolID):
     return Protocol(client.protocol.find_one({"protocolID" : protocolID}))
 
 
-def getProtocolByName(name1, name2):
+def getProtocolByName(user1, user2):
     client = getMongoClient()
-    filter = { "$or": [ { "$and": [ {'iniciator': f"{user1}"},{'responder': f"{user2}"}]}, { "$and": [ {'iniciator': f"{user1}"},{'responder': f"{user2}"}]}]}
-    return Protocol(client.protocol.find_one(filter)).getData()
-
+    filter = { "$or": [ { "$and": [ {'iniciator': f"{user1}"},{'responder': f"{user2}"}]}, { "$and": [ {'iniciator': f"{user2}"},{'responder': f"{user1}"}]}]}
+    result = client.protocol.find_one(filter)
+    if result is None:
+        return None
+    else:
+        return Protocol(result).getData().toDictionary()
+        
 def getOpenProtocols(name):
     client = getMongoClient()
     filter = { "$or": [ {'iniciator': f"{name}"},{'responder': f"{name}"}]}
@@ -60,21 +64,22 @@ def putSecondRound(protocolID, v):
     client.protocol.update_one(filter, update)
 
 
-def putThirdRound(protocolID, iniciatorChecks):
+def putThirdRound(protocolID, messagesForResponder):
     client = getMongoClient()
     filter = { "protocolID": f"{protocolID}" }
-    update = { "$set": { "iniciatorChecks": f"{iniciatorChecks}", "round": "3" } }
+    update = { "$set": { "messagesForResponder": f"{messagesForResponder}", "round": "3" } }
     client.protocol.update_one(filter, update)
 
 
 def putFourthRound(protocolID, responderLabels):
     client = getMongoClient()
     filter = { "protocolID": f"{protocolID}" }
-    update = { "$set": { "iniciatorChecks": f"{responderLabels}", "round": "4" } }
+    update = { "$set": { "responderLabels": f"{responderLabels}", "round": "4" } }
     client.protocol.update_one(filter, update)
 
 
 def putResult(user1, user2, result):
     client = getMongoClient()
+    print(type(result))
     result = Result(user1, user2, result)
     client.result.insert_one(result.toDictionary())
