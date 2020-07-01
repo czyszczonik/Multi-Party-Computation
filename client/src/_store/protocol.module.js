@@ -18,7 +18,6 @@ const actions = {
                     var user = JSON.parse(localStorage.getItem('user'));
                     var username = user.username;
                     protocols.forEach(element => {
-                        console.log(element);
                         if (element.round == 3) {
                             var id = element.protocolID
                             var name = element.responder
@@ -37,7 +36,6 @@ const actions = {
                             var name = element.iniciator;
                             var messages = JSON.parse(element.messagesForResponder);
                             var result = protocolService.step4(name, messages);
-                            console.log(result)
                             apiService.step4(
                                 id,
                                 username,
@@ -79,7 +77,6 @@ const actions = {
                         var user = JSON.parse(localStorage.getItem('user'));
                         var username = user.username;
                         
-                        console.log(response)
                         var encryptions = JSON.parse(response.encryptions);
                         var ac = response.iniciatorChoice;
                         var pubKey = JSON.parse(response.pubKey);

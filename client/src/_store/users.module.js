@@ -28,16 +28,6 @@ const actions = {
             );
     },
 
-    update({ commit, state }, userData) {
-        commit('updateRequest');
-
-        userService.update(userData)
-            .then(
-                response => commit('updateSuccess'),
-                error => commit('updateFailure', {error: error.toString()})
-            );
-    },
-
     getAll({ commit, state}) {
         userService.getAll()
             .then(
@@ -91,15 +81,6 @@ const mutations = {
 
             return user;
         })
-    },
-    updateRequest(state) {
-        state.all = { loading: true };
-    },
-    updateSuccess(state) {
-        state.all = { loading: false};
-    },
-    updateFailure(state, error) {
-        state.all = { loading: false}; //TODO: handle the error message
     },
     getAllSuccess(state, users) {
         state.all.items = users;

@@ -125,7 +125,8 @@ export default {
         },
         getImageUrl(user) {
             var uname = user.username;
-            return "https://thispersondoesnotexist.com/image?"+uname;
+            // return "https://thispersondoesnotexist.com/image?"+uname;
+            return "https://thiscatdoesnotexist.com/?"+uname;
         }
     }
 };

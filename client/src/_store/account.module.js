@@ -23,7 +23,7 @@ const actions = {
     },
     logout({ commit }) {
         userService.logout();
-        // localStorage.clear();
+        localStorage.clear();
         commit('logout');
     },
     register({ dispatch, commit }, user) {
@@ -47,6 +47,13 @@ const actions = {
     },
     getSalt({ dispatch, commit }, username) {
         return userService.getSalt(username);
+    },
+    update({ commit, state }, userData) {
+        userService.update(userData)
+            .then(
+                response => commit('updateSuccess', userData),
+                // error => commit('updateFailure', {error: error.toString()})
+            );
     },
 };
 
@@ -76,6 +83,10 @@ const mutations = {
     registerFailure(state, error) {
         state.status = {};
     },
+    updateSuccess(state, userData){
+        state.user = userData;
+    }
+
 };
 
 export const account = {

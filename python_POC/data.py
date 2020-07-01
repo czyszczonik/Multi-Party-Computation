@@ -29,8 +29,12 @@ username = ["Roman", "Asia", "Filip"]
     # client.users.delete_one({"username" : f"{username[x]}"})
 # client.profile.delete_one({"username" : f"{username[x]}"})
 
-# client.protocol.drop()
-# client.result.drop()
+client.users.drop()
+client.profile.drop()
+client.protocol.drop()
+client.result.drop()
+client.secret.drop()
+
 # client.protocol.delete_one({"iniciator" : f"tom"})
 
 # client.result.delete_one({"result" : 1})
@@ -53,25 +57,26 @@ username = ["Roman", "Asia", "Filip"]
 ###################################################################################
 #                                   FINDING                                       #
 ###################################################################################
-# print("_"*100)
+print("_"*100)
 
-# for x in client.users.find():
-#     print(x)
-# print("_"*100)
-# print("_"*100)
-# for x in client.result.find():
-#     print(x)
-# print("_"*100)
+for x in client.users.find():
+    print(x)
+print("_"*100)
+
+for x in client.profile.find():
+    print(x)
+print("_"*100)
 
 
-# print("_"*100)
-# for x in client.protocol.find():
-#     print(x)
-# print("_"*100)
-# user = "admin1"
-# openProtocols = client.protocol.find({ "$or": [ {'iniciator': f"{user}"},{ "$and": [ {"round": {"$nin": [1]}},{'responder': f"{user}"}]}]})
-# round1 = client.protocol.find()
+print("_"*100)
+for x in client.result.find():
+    print(x)
+print("_"*100)
 
-# for x in round1:
-#     print(x)
+
+print("_"*100)
+for x in client.protocol.find():
+    print(x)
+print("_"*100)
+
     

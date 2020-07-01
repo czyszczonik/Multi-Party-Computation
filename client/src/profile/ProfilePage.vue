@@ -31,7 +31,7 @@
                         <!-- <span v-if="user.deleting"><em> - Deleting...</em></span>
                         <span v-else-if="user.deleteError" class="text-danger"> - ERROR: {{user.deleteError}}</span> <span v-else-->
                         
-                        <span><a @click="deleteUser(account.user.username)" class="text-danger">Delete account</a></span>
+                        <!-- <span><a @click="deleteUser(account.user.username)" class="text-danger">Delete account</a></span> -->
                     </div>
                 </form>
             </div>
@@ -60,6 +60,9 @@ export default {
         ...mapActions('users', {
             getUserData: 'getData',
             deleteUser: 'delete',
+            update: 'update'
+        }),
+        ...mapActions('account', {
             update: 'update'
         }),
         handleSubmit (e) {
