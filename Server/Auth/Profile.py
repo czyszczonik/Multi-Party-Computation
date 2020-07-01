@@ -4,10 +4,10 @@ class Profile():
             self.username = username
             self.firstName = firstName
             self.lastName = lastName
-            self.age = {}
-            self.bio = {}
-            self.imageUrl = {}
-            self.phone = {}
+            self.age = ""
+            self.bio = ""
+            self.imageUrl = ""
+            self.phone = ""
         else:
             self.username = username.get("username",{})
             self.firstName = username.get("firstName",{})

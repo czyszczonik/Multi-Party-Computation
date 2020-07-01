@@ -80,6 +80,5 @@ def putFourthRound(protocolID, responderLabels):
 
 def putResult(user1, user2, result):
     client = getMongoClient()
-    print(type(result))
     result = Result(user1, user2, result)
     client.result.insert_one(result.toDictionary())

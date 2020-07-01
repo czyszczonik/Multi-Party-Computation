@@ -1,6 +1,7 @@
 import pymongo
 from .Client import getMongoClient
 from .Profile import Profile
+from flask import Markup
 
 def createProfile(username, name, age, bio):
     client = getMongoClient()
@@ -13,6 +14,7 @@ def getProfileInfo(username):
 
 def updateProfileInfo(username, field, value):
     client = getMongoClient()
+    value = Markup.escape(value)
     filter = { "username": f"{username}" }
     update = { "$set": { f"{field}": f"{value}" } }
     client.profile.update_one(filter, update)

@@ -1,7 +1,7 @@
 from .DBAuthHandler import getSalt, getUser, createUser, getUserProfile
 from .User import User
 from .Profile import Profile
-from flask import make_response, jsonify
+from flask import make_response, jsonify, Markup
 from flask_jwt_extended import create_access_token
 import bcrypt
 import datetime
@@ -39,8 +39,8 @@ def login(body):
 def register(body):
     username = body.get('username')
     password = body.get('password')
-    firstName = body.get('firstName')
-    lastName = body.get('lastName')
+    firstName = Markup.escape(body.get('firstName'))
+    lastName = Markup.escape(body.get('lastName'))
     
     salt = body.get('salt')
     if getUser(username).username is not None:

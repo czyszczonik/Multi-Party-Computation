@@ -29,11 +29,11 @@ username = ["Roman", "Asia", "Filip"]
     # client.users.delete_one({"username" : f"{username[x]}"})
 # client.profile.delete_one({"username" : f"{username[x]}"})
 
-client.users.drop()
-client.profile.drop()
+# client.users.drop()
+# client.profile.drop()
 client.protocol.drop()
 client.result.drop()
-client.secret.drop()
+# client.secret.drop()
 
 # client.protocol.delete_one({"iniciator" : f"tom"})
 
@@ -57,21 +57,15 @@ client.secret.drop()
 ###################################################################################
 #                                   FINDING                                       #
 ###################################################################################
-print("_"*100)
+# print("_"*100)
 
-for x in client.users.find():
-    print(x)
-print("_"*100)
+# for x in client.users.find():
+#     print(x)
+# print("_"*100)
 
-for x in client.profile.find():
-    print(x)
-print("_"*100)
-
-
-print("_"*100)
-for x in client.result.find():
-    print(x)
-print("_"*100)
+# for x in client.profile.find():
+#     print(x)
+# print("_"*100)
 
 
 print("_"*100)
@@ -80,3 +74,9 @@ for x in client.protocol.find():
 print("_"*100)
 
     
+print("_"*100)
+for x in client.result.find():
+    print(x)
+print("_"*100)
+
+
